@@ -6,8 +6,9 @@ import os
 import sys
 import signal
 from protocol import ServerProtocol
-
+import time
 logger = logging.getLogger("server.error")
+logger.level = logging.INFO
 
 
 HANDLED_SIGNALS = (
@@ -85,12 +86,13 @@ class Server:
             logger.error(exc)
             sys.exit(1)
 
-        message = f"Server running on {self.host + ':' + self.port} (Press CTRL+C to quit)"
+        message = f"Server running on {self.host + ':' + str(self.port)} (Press CTRL+C to quit)"
         color_message = (
             "Server running on "
-            + click.style(self.host + ':' + self.port, bold=True)
+            + click.style(self.host + ':' + str(self.port), bold=True)
             + " (Press CTRL+C to quit)"
         )
+        print(message)
         logger.info(
             message,
             'ProxyServer',
@@ -109,6 +111,12 @@ class Server:
             counter += 1
             counter = counter % 864000
             await asyncio.sleep(0.1)
+            should_exit = await self.on_tick(counter)
+
+    async def on_tick(self, counter) -> bool:
+        if self.should_exit:
+            return True
+        return False
 
     async def shutdown(self, sockets=None):
         logger.info("Shutting down")

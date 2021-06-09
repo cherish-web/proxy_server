@@ -58,8 +58,7 @@ class ClientProtocol(Protocol):
 
 
 class ServerProtocol(Protocol):
-    def __init__(self, server_state, on_con_lost):
-        self.on_con_lost = on_con_lost
+    def __init__(self, server_state):
         self.disconnected = True
         self.transport = None
         self.flow = None
@@ -77,4 +76,4 @@ class ServerProtocol(Protocol):
     def connection_lost(self, exc):
         print('服务器连接断开')
         self.disconnected = True
-        self.on_con_lost.set_result(True)
+
